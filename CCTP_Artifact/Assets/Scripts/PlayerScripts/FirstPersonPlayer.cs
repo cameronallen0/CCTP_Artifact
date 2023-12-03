@@ -12,9 +12,10 @@ public class FirstPersonPlayer : MonoBehaviour
     
     [SerializeField] private Camera cam;
     [SerializeField] private float movementSpeed;
+    [SerializeField] private float crouchSpeed = 3f;
     [SerializeField] private float walkSpeed = 6f;
     [SerializeField] private float runSpeed = 10f;
-    [SerializeField] public float lookSensitivity = 1.0f;
+    [SerializeField] public float lookSensitivity = 30f;
     
     private float xRotation = 0f;
 
@@ -37,6 +38,7 @@ public class FirstPersonPlayer : MonoBehaviour
     // Crouch Variables
     private float initHeight;
     [SerializeField] private float crouchHeight;
+    private bool isCrouching;
 
     private void Awake()
     {
@@ -88,7 +90,15 @@ public class FirstPersonPlayer : MonoBehaviour
             isJumping = false;
             isRunning = false;
         }
-
+        if(isCrouching && grounded)
+        {
+            movementSpeed = crouchSpeed;
+        }
+        else
+        {
+            movementSpeed = walkSpeed;
+        }
+        
         Vector2 movement = GetPlayerMovement();
         Vector3 move = transform.right * movement.x + transform.forward * movement.y;
         controller.Move(move * movementSpeed * Time.deltaTime);
@@ -99,14 +109,21 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void DoRun()
     {
-        if(inputActions.FPSController.Run.ReadValue<float>() > 0)
+        if(isCrouching && grounded)
         {
-            isRunning = !isRunning;
-            movementSpeed = runSpeed;
+            isRunning = false;
         }
         else
         {
-            movementSpeed = walkSpeed;
+            if (inputActions.FPSController.Run.ReadValue<float>() > 0)
+            {
+                isRunning = !isRunning;
+                movementSpeed = runSpeed;
+            }
+            else
+            {
+                movementSpeed = walkSpeed;
+            }
         }
     }
 
@@ -127,17 +144,23 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         if (inputActions.FPSController.Crouch.ReadValue<float>() > 0)
         {
+            isCrouching = true;
             controller.height = crouchHeight;
+            movementSpeed = crouchSpeed;
         }
         else
         {
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), 2.0f, -1))
             {
                 controller.height = crouchHeight;
+                movementSpeed = crouchSpeed;
             }
             else
             {
                 controller.height = initHeight;
+                movementSpeed = walkSpeed;
+                isCrouching = false;
+
             }
         }
     }
