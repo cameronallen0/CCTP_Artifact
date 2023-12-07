@@ -73,13 +73,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 2240643065093264031}
-  movementSpeed: 6
-  crouchSpeed: 3
-  walkSpeed: 6
-  runSpeed: 10
-  lookSensitivity: 30
-  gravity: -19.62
-  jumpHeight: 3
+  movementSpeed: 10
+  crouchSpeed: 5
+  walkSpeed: 10
+  runSpeed: 15
+  lookSensitivity: 50
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  gravity: -24.525
+  rocketHeight: 20
+  jumpHeight: 4
   zoomFOV: 35
   zoomSpeed: 9
   crouchHeight: 0

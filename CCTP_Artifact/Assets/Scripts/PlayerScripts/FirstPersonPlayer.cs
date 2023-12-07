@@ -12,11 +12,13 @@ public class FirstPersonPlayer : MonoBehaviour
     
     [SerializeField] private Camera cam;
     [SerializeField] private float movementSpeed;
-    [SerializeField] private float crouchSpeed = 3f;
-    [SerializeField] private float walkSpeed = 6f;
-    [SerializeField] private float runSpeed = 10f;
+    [SerializeField] private float crouchSpeed = 5f;
+    [SerializeField] private float walkSpeed = 10f;
+    [SerializeField] private float runSpeed = 15f;
     [SerializeField] public float lookSensitivity = 30f;
-    
+
+    public LayerMask groundLayer;
+
     private float xRotation = 0f;
 
     // Movement Variables
@@ -24,6 +26,9 @@ public class FirstPersonPlayer : MonoBehaviour
     public float gravity = -19.62f;
     private bool grounded;
     private bool isRunning;
+
+    //Rocket Variables
+    [SerializeField] private float rocketHeight = 20.0f;
 
     //Jump Variables
     [SerializeField] private float jumpHeight = 3.0f;
@@ -65,6 +70,7 @@ public class FirstPersonPlayer : MonoBehaviour
         DoCrouch();
         DoJump();
         DoRun();
+        DoFire();
     }
 
     private void DoLooking()
@@ -164,6 +170,19 @@ public class FirstPersonPlayer : MonoBehaviour
             }
         }
     }
+
+    private void DoFire()
+    {
+        if(grounded)
+        {
+            if(inputActions.FPSController.Fire.triggered)
+            {
+                Debug.Log("SHOOT");
+                velocity.y = Mathf.Sqrt(rocketHeight * -2f * gravity);
+            }
+        }      
+    }
+
 
     private void DoJump()
     {
