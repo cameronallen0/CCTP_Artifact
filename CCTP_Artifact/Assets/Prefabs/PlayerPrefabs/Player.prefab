@@ -72,6 +72,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44e18e8114ae62048909b8b511263ede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
   cam: {fileID: 2240643065093264031}
   movementSpeed: 10
   crouchSpeed: 5
@@ -80,9 +81,10 @@ MonoBehaviour:
   lookSensitivity: 50
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   gravity: -24.525
-  rocketHeight: 20
+  radius: 5
+  power: 10
   jumpHeight: 4
   zoomFOV: 35
   zoomSpeed: 9

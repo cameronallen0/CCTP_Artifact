@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +10,7 @@ public class FirstPersonPlayer : MonoBehaviour
     private PlayerControls inputActions;
 
     private CharacterController controller;
-    
+
     [SerializeField] private Camera cam;
     [SerializeField] private float movementSpeed;
     [SerializeField] private float crouchSpeed = 5f;
@@ -28,7 +29,9 @@ public class FirstPersonPlayer : MonoBehaviour
     private bool isRunning;
 
     //Rocket Variables
-    [SerializeField] private float rocketHeight = 20.0f;
+    private bool isLaunching = false;
+    private Vector3 launchDirection;
+    public float rocketHeight = 10f;
 
     //Jump Variables
     [SerializeField] private float jumpHeight = 3.0f;
@@ -173,16 +176,57 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void DoFire()
     {
-        if(grounded)
+        if (grounded)
         {
-            if(inputActions.FPSController.Fire.triggered)
+            if (inputActions.FPSController.Fire.triggered)
             {
-                Debug.Log("SHOOT");
-                velocity.y = Mathf.Sqrt(rocketHeight * -2f * gravity);
+                Vector2 clickPosition = GetMousePositionInWorld();
+
+                RaycastHit hit;
+                if (Physics.Raycast(cam.ScreenPointToRay(clickPosition), out hit, Mathf.Infinity, groundLayer))
+                {
+                    Debug.Log("SHOOT");
+
+                    // Calculate the launch direction opposite to the raycast direction, considering character rotation
+                    Vector3 raycastDirection = (hit.point - transform.position).normalized;
+
+                    // Consider only the y-axis rotation to ensure backward launch
+                    float characterRotationY = transform.eulerAngles.y;
+                    launchDirection = Quaternion.Euler(0f, characterRotationY, 0f) * -Vector3.forward;
+
+                    // Launch in the opposite direction
+                    velocity.y = Mathf.Sqrt(rocketHeight * -2f * gravity);
+                    isLaunching = true;
+                }
             }
-        }      
+        }
+
+        if (isLaunching)
+        {
+            // Check if the player has come to a stop
+            if (velocity.magnitude < 0.1f)
+            {
+                isLaunching = false;
+            }
+
+            // Apply the launch direction
+            controller.Move(launchDirection * 10f * Time.deltaTime);
+        }
     }
 
+
+    private Vector2 GetMousePositionInWorld()
+    {
+        Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
+        RaycastHit hit;
+
+        if(Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
+        {
+            return hit.point;
+        }
+
+        return Vector2.zero;
+    }
 
     private void DoJump()
     {
